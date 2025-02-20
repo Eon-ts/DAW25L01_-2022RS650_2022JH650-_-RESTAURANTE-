@@ -7,5 +7,6 @@ namespace L01_2022RS650_2022JH650.Models
         {
         }
         public DbSet<pedidos> pedidos { get; set; }
+        public DbSet<platos> platos { get; set; }
     }
 }
