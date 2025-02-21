@@ -22,8 +22,27 @@ namespace L01_2022RS650_2022JH650.Controllers
         [Route("GetAll")]
         public IActionResult Get()
         {
-            List<pedidos> listadopedidos = (from e in _restauranteDBContexto.pedidos
-                                           select e).ToList();
+            var listadopedidos = (from e in _restauranteDBContexto.pedidos
+                                  join c in _restauranteDBContexto.clientes
+                                  on e.clienteid equals c.clienteid
+                                  join m in _restauranteDBContexto.motoristas
+                                  on e.motoristaid equals m.motoristaid
+                                  join p in _restauranteDBContexto.platos
+                                  on e.platoid equals p.platoid
+                                  select new
+                                  {
+                                      e.pedidoid,
+                                      e.motoristaid,
+                                      Motorista = m.nombremotorista,
+                                      e.clienteid,
+                                      NombreCliente = c.nombrecliente,
+                                      e.platoid,
+                                      Plato = p.nombreplato,
+                                      e.cantidad,
+                                      e.precio
+                                  }).ToList();
+
+
             if (listadopedidos.Count == 0)
             {
                 return NotFound();
@@ -49,8 +68,26 @@ namespace L01_2022RS650_2022JH650.Controllers
         {
             var pedidosCliente = (from e in _restauranteDBContexto.pedidos
                                   join c in _restauranteDBContexto.clientes on e.clienteid equals c.clienteid
+                                  join m in _restauranteDBContexto.motoristas
+                                  on e.motoristaid equals m.motoristaid
+                                  join p in _restauranteDBContexto.platos
+                                  on e.platoid equals p.platoid
                                   where c.nombrecliente.Contains(cliente)
-                                  select e).ToList();
+                                  select new
+                                  {
+                                      e.pedidoid,
+                                      e.motoristaid,
+                                      Motorista = m.nombremotorista,
+                                      e.clienteid,
+                                      NombreCliente = c.nombrecliente,
+                                      e.platoid,
+                                      Plato = p.nombreplato,
+                                      e.cantidad,
+                                      e.precio
+                                  }).ToList();
+
+
+
 
             if (pedidosCliente.Count == 0)
             {
@@ -65,9 +102,24 @@ namespace L01_2022RS650_2022JH650.Controllers
         public IActionResult FindByMotorista(string motorista)
         {
             var pedidosMotorista = (from e in _restauranteDBContexto.pedidos
-                                    join c in _restauranteDBContexto.motoristas on e.motoristaid equals c.motoristaid
-                                    where c.nombremotorista.Contains(motorista)
-                                    select e).ToList();
+                                    join m in _restauranteDBContexto.motoristas on e.motoristaid equals m.motoristaid
+                                    join c in _restauranteDBContexto.clientes
+                                    on e.clienteid equals c.clienteid
+                                    join p in _restauranteDBContexto.platos
+                                    on e.platoid equals p.platoid
+                                    where m.nombremotorista.Contains(motorista)
+                                    select new
+                                    {
+                                        e.pedidoid,
+                                        e.motoristaid,
+                                        Motorista = m.nombremotorista,
+                                        e.clienteid,
+                                        NombreCliente = c.nombrecliente,
+                                        e.platoid,
+                                        Plato = p.nombreplato,
+                                        e.cantidad,
+                                        e.precio
+                                    }).ToList();
 
             if (pedidosMotorista.Count == 0)
             {
@@ -100,6 +152,7 @@ namespace L01_2022RS650_2022JH650.Controllers
                                      join p in _restauranteDBContexto.platos on t.PlatoId equals p.platoid
                                      select new
                                      {
+                                         PlatoId = t.PlatoId,
                                          Plato = p.nombreplato,
                                          t.CantidadDePedidos
                                      }).ToList();
