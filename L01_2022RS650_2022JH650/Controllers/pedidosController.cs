@@ -77,6 +77,37 @@ namespace L01_2022RS650_2022JH650.Controllers
             return Ok(pedidosMotorista);
         }
 
+        [HttpGet]
+        [Route("GetByTopN/{cantidad}")]
+        public IActionResult GetCantidad(int cantidad)
+        {
+
+            //La única solución que encontramos es agrupar pedidos por plato para ordenarlo descendente (Top N)
+            var topPlatos = (from e in _restauranteDBContexto.pedidos group e by e.platoid into platoGroup orderby platoGroup.Count() descending
+                             select new
+                             {
+                                 PlatoId = platoGroup.Key,
+                                 CantidadDePedidos = platoGroup.Count()
+                             }).Take(cantidad).ToList();
+
+            if (topPlatos.Count == 0)
+            {
+                return NotFound();
+            }
+
+            //Para mostrar con nombre de plato en lugar de id
+            var topPlatosNombre = (from t in topPlatos
+                                     join p in _restauranteDBContexto.platos on t.PlatoId equals p.platoid
+                                     select new
+                                     {
+                                         Plato = p.nombreplato,
+                                         t.CantidadDePedidos
+                                     }).ToList();
+
+            return Ok(topPlatosNombre);
+
+        }
+
         [HttpPost]
         [Route("Add")]
         public IActionResult GuardarEquipo([FromBody] pedidos pedido)
