@@ -9,6 +9,6 @@ namespace L01_2022RS650_2022JH650.Models
         public int clienteid { get; set; }
         public int platoid { get; set; }
         public int cantidad { get; set; }
-        public double precio { get; set; }
+        public decimal precio { get; set; }
     }
 }
